@@ -7,9 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class MedicationApplication {
     public static void main(String[] args) {
         SpringApplication.run(MedicationApplication.class, args);
-        System.out.println("💊 Календарь приёма лекарств запущен! (Java 18 + Spring Boot 3)");
-        System.out.println("📍 http://localhost:8080");
-        System.out.println("📊 H2 Console: http://localhost:8080/h2-console");
+        System.out.println("💊 Календарь приёма лекарств запущен!");
+        System.out.println("📍 Веб-интерфейс: http://localhost:8080");
         System.out.println("🔗 REST API: http://localhost:8080/api/medications");
+        System.out.println("📊 H2 Console: http://localhost:8080/h2-console");
     }
 }

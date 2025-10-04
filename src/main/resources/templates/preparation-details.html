@@ -4,75 +4,88 @@
     <meta charset="UTF-8">
     <title>Детали лекарства</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <style>
+        .schedule-card {
+            border-left: 3px solid #6c757d;
+        }
+        .schedule-taken {
+            border-left: 3px solid #28a745;
+            background-color: #f8fff8;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" th:href="@{/}">💊 Календарь лекарств</a>
-        </div>
-    </nav>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="/">💊 Календарь лекарств</a>
+    </div>
+</nav>
 
-    <div class="container mt-4">
-        <div class="row">
-            <div class="col-12">
-                <a th:href="@{/medications}" class="btn btn-outline-secondary mb-3">← Назад</a>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <h3 th:text="${preparation.name}">Название лекарства</h3>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <a th:href="@{/medications}" class="btn btn-outline-secondary mb-3">← Назад к списку</a>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 th:text="${preparation.name}">Название лекарства</h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>Описание:</strong> <span th:text="${preparation.description}"></span></p>
+                    <p><strong>Период приёма:</strong>
+                        <span th:text="${#dates.format(preparation.startDate, 'dd.MM.yyyy')}"></span> -
+                        <span th:text="${#dates.format(preparation.endDate, 'dd.MM.yyyy')}"></span>
+                    </p>
+
+                    <h5>Расписание приёмов:</h5>
+                    <div th:if="${preparation.schedules.empty}" class="alert alert-info">
+                        Расписание не настроено
                     </div>
-                    <div class="card-body">
-                        <p><strong>Описание:</strong> <span th:text="${preparation.description}"></span></p>
-                        <p><strong>Период приёма:</strong> 
-                            <span th:text="${preparation.startDate}"></span> - 
-                            <span th:text="${preparation.endDate}"></span>
-                        </p>
-                        
-                        <h5>Расписание приёмов:</h5>
-                        <div th:if="${preparation.schedules.empty}" class="alert alert-info">
-                            Расписание не настроено
-                        </div>
-                        <div th:each="schedule : ${preparation.schedules}" class="card mb-2">
-                            <div class="card-body py-2">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <strong th:text="${schedule.time}"></strong> - 
-                                        <span th:text="${schedule.dosage}"></span>
-                                    </div>
-                                    <div>
-                                        <span th:if="${schedule.taken}" class="badge bg-success status-taken">✓ Принято</span>
-                                        <span th:unless="${schedule.taken}" class="badge bg-warning text-dark status-pending">⏳ Ожидает</span>
-                                        <form th:action="@{/medications/schedules/{id}/mark-taken(id=${schedule.id})}" method="post" class="d-inline">
-                                            <button th:unless="${schedule.taken}" type="submit" class="btn btn-sm btn-success ms-2">Отметить</button>
-                                        </form>
-                                    </div>
+                    <div th:each="schedule : ${preparation.schedules}"
+                         class="card mb-2"
+                         th:classappend="${schedule.taken} ? 'schedule-taken' : 'schedule-card'">
+                        <div class="card-body py-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong th:text="${#temporals.format(schedule.time, 'HH:mm')}"></strong> -
+                                    <span th:text="${schedule.dosage}"></span>
+                                </div>
+                                <div>
+                                    <span th:if="${schedule.taken}" class="badge bg-success">✓ Принято</span>
+                                    <span th:unless="${schedule.taken}" class="badge bg-warning text-dark">⏳ Ожидает</span>
+                                    <form th:action="@{/medications/schedules/{id}/mark-taken(id=${schedule.id})}" method="post" class="d-inline">
+                                        <button th:unless="${schedule.taken}" type="submit" class="btn btn-sm btn-success ms-2">Отметить принятым</button>
+                                    </form>
+                                    <form th:action="@{/medications/schedules/{id}/mark-pending(id=${schedule.id})}" method="post" class="d-inline">
+                                        <button th:if="${schedule.taken}" type="submit" class="btn btn-sm btn-secondary ms-2">Вернуть в ожидание</button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
-                        
-                        <hr>
-                        <h5>Добавить приём:</h5>
-                        <form th:action="@{/medications/{id}/schedules(id=${preparation.id})}" th:object="${schedule}" method="post" class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label">Время</label>
-                                <input type="time" th:field="*{time}" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Дозировка</label>
-                                <input type="text" th:field="*{dosage}" class="form-control" placeholder="500 мг" required>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">&nbsp;</label>
-                                <button type="submit" class="btn btn-primary w-100">Добавить</button>
-                            </div>
-                        </form>
                     </div>
+
+                    <hr>
+                    <h5>Добавить приём:</h5>
+                    <form th:action="@{/medications/{id}/schedules(id=${preparation.id})}" th:object="${schedule}" method="post" class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Время</label>
+                            <input type="time" th:field="*{time}" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Дозировка</label>
+                            <input type="text" th:field="*{dosage}" class="form-control" placeholder="500 мг" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary w-100">Добавить</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
