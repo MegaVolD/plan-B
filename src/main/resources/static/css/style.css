@@ -1,0 +1,33 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.medication-card {
+    border-left: 4px solid #007bff;
+    transition: transform 0.2s;
+}
+
+.medication-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.today-card {
+    background-color: #e8f5e8;
+    border-left: 4px solid #28a745;
+}
+
+.status-taken {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.status-pending {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
